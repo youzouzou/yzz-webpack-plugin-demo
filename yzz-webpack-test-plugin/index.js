@@ -1,6 +1,11 @@
 const pluginName = 'yzzWebpackTestPlugin';
+const nodemailer = require("nodemailer");
 
 class YzzWebpackTestPlugin {
+  constructor(options) {
+    this.options = options || {};
+  }
+
   apply(compiler) {
     compiler.hooks.initialize.tap(pluginName, () => {
       console.log('1、webpack initialize');
@@ -18,6 +23,16 @@ class YzzWebpackTestPlugin {
       console.log('4、webpack afterDone');
       if (stats){
         // console.log("统计信息", stats.toString());
+        // 发送邮件 TODO:
+        const fromEmail = "xxx@qq.com"; // 这里改成你的QQ邮箱
+        const password = "xxxx";// 这里改成你的QQ授权码
+        const toEmail = "xxx@163.com"; // 这里改成你要发送到的邮箱
+        const host = "smtp.qq.com"; // 这里是QQ邮箱的host
+        const subject = stats.hasErrors() ? "[ERROR]webpack打包失败" :"[SUCCESS]webpack打包成功";
+        const html = stats.toString();
+        emailTo(host, fromEmail, password, toEmail, subject, undefined, html, function (data) {
+          res.status(data.httpCode).json(data);
+        })
       }
     });
     compiler.hooks.additionalPass.tap(pluginName, () => {
@@ -103,6 +118,51 @@ class YzzWebpackTestPlugin {
     //   console.log('31、webpack entryOption');
     // });
   }
+}
+
+// https://nodemailer.com/about/
+// https://www.cnblogs.com/jackson-yqj/p/10154296.html
+function emailTo(host, fromEmail, password, toEmail, subject, text, html, callback) {
+  var transporter = nodemailer.createTransport({
+    host: host,
+    auth: {
+      user: fromEmail,
+      pass: password // 如果发送邮箱是QQ邮箱，则为授权码
+
+    }
+  });
+  var mailOptions = {
+    from: fromEmail, // 发送者
+    to: toEmail, // 接受者,可以同时发送多个,以逗号隔开
+    subject: subject, // 标题
+  };
+  if (text != undefined) {
+    mailOptions.text = text;// 文本
+  }
+  if (html != undefined) {
+    mailOptions.html = html;// html
+  }
+
+  var result = {
+    httpCode: 200,
+    message: '发送成功!',
+  }
+  try {
+    transporter.sendMail(mailOptions, function (err, info) {
+      if (err) {
+        result.httpCode = 500;
+        result.message = err;
+        callback(result);
+        return;
+      }
+      callback(result);
+    });
+  } catch (err) {
+    result.httpCode = 500;
+    result.message = err;
+    callback(result);
+  }
+
 }
 
 module.exports = YzzWebpackTestPlugin;
