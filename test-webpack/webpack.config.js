@@ -14,7 +14,13 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: "Webpack~",
     }),
-    new YzzWebpackTestPlugin()
+    // 邮件发送参数参见https://nodemailer.com/about/
+    new YzzWebpackTestPlugin({
+      fromEmail: "xxx@qq.com", // 发送方邮箱
+      password: "xxxx", // 如果是QQ邮箱，则为QQ邮箱授权码
+      toEmail: "xxx@xx.com", // 接收方邮箱
+      host: "smtp.qq.com"
+    })
   ],
   // stats: 'errors-only'
 };

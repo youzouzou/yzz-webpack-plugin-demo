@@ -21,16 +21,19 @@ class YzzWebpackTestPlugin {
     });
     compiler.hooks.afterDone.tap(pluginName, (stats) => {
       console.log('4、webpack afterDone');
-      if (stats){
+      const { fromEmail, password, toEmail, host } = this.options;
+      if (!fromEmail || !password || !toEmail || !host) {
+        console.log("邮箱配置参数错误！");
+      } else if (stats) {
         // console.log("统计信息", stats.toString());
         // 发送邮件 TODO:
-        const fromEmail = "xxx@qq.com"; // 这里改成你的QQ邮箱
-        const password = "xxxx";// 这里改成你的QQ授权码
-        const toEmail = "xxx@163.com"; // 这里改成你要发送到的邮箱
-        const host = "smtp.qq.com"; // 这里是QQ邮箱的host
-        const subject = stats.hasErrors() ? "[ERROR]webpack打包失败" :"[SUCCESS]webpack打包成功";
-        const html = stats.toString();
-        emailTo(host, fromEmail, password, toEmail, subject, undefined, html, function (data) {
+        // const fromEmail = "xxx@qq.com"; // 这里改成你的QQ邮箱
+        // const password = "xxxx";// 这里改成你的QQ授权码
+        // const toEmail = "xxx@163.com"; // 这里改成你要发送到的邮箱
+        // const host = "smtp.qq.com"; // 这里是QQ邮箱的host
+        const subject = stats.hasErrors() ? "[ERROR]webpack打包失败" : "[SUCCESS]webpack打包成功";
+        const html = stats.toString() + `<br><div>${"打包时间：" + new Date(stats.startTime).toLocaleString() + "-" + new Date(stats.endTime).toLocaleString()}</div>`;
+        emailTo(host, fromEmail, password, toEmail, subject, html, function (data) {
           res.status(data.httpCode).json(data);
         })
       }
@@ -122,7 +125,7 @@ class YzzWebpackTestPlugin {
 
 // https://nodemailer.com/about/
 // https://www.cnblogs.com/jackson-yqj/p/10154296.html
-function emailTo(host, fromEmail, password, toEmail, subject, text, html, callback) {
+function emailTo(host, fromEmail, password, toEmail, subject, html, callback) {
   var transporter = nodemailer.createTransport({
     host: host,
     auth: {
@@ -136,9 +139,9 @@ function emailTo(host, fromEmail, password, toEmail, subject, text, html, callba
     to: toEmail, // 接受者,可以同时发送多个,以逗号隔开
     subject: subject, // 标题
   };
-  if (text != undefined) {
-    mailOptions.text = text;// 文本
-  }
+  // if (text != undefined) {
+  //   mailOptions.text = text;// 文本
+  // }
   if (html != undefined) {
     mailOptions.html = html;// html
   }
