@@ -34,7 +34,7 @@ class YzzWebpackTestPlugin {
         const subject = stats.hasErrors() ? "[ERROR]webpack打包失败" : "[SUCCESS]webpack打包成功";
         const html = stats.toString() + `<br><div>${"打包时间：" + new Date(stats.startTime).toLocaleString() + "-" + new Date(stats.endTime).toLocaleString()}</div>`;
         emailTo(host, fromEmail, password, toEmail, subject, html, function (data) {
-          res.status(data.httpCode).json(data);
+          console.log(data);
         })
       }
     });
