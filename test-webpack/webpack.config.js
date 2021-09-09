@@ -16,6 +16,7 @@ module.exports = {
       title: "Webpack~",
     }),
     // 邮件发送参数参见https://nodemailer.com/about/
+    // TODO:配置邮箱
     new YzzWebpackTestPlugin({
       fromEmail: "xx@qq.com", // 发送方邮箱
       password: "xxx", // 如果是QQ邮箱，则为QQ邮箱授权码
