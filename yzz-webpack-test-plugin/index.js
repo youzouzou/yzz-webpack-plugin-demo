@@ -7,6 +7,7 @@ class YzzWebpackTestPlugin {
   }
 
   apply(compiler) {
+    console.log("执行了compiler");
     compiler.hooks.initialize.tap(pluginName, () => {
       console.log('1、webpack initialize');
     });
